@@ -1,0 +1,377 @@
+hdlin_enable_analysis_info = false
+hdlin_write_gtech_design_directory = ./gtech
+hdlin_enable_vpp = true
+template_parameter_style = "%d"
+
+compile_create_mux_op_hierarchy = false
+compile_mux_no_boundary_optimization = false
+compile_preserve_sync_resets = true
+compile_delete_unloaded_sequential_cells = true
+compile_disable_hierarchical_inverter_opt = true
+compile_new_boolean_structure = true
+
+/**************  
+ * The following variables are set as specified in the file
+ * lsi_verilog_setup.scr obtained with the LSI release of tools
+ * and libraries  ( cp - 11/4/99 )
+ **************/
+
+bus_dimension_separator_style           = "]["
+bus_inference_style                     = "%s[%d]"
+bus_inference_style                     = "%s<%d>"
+bus_naming_style                        = "%s[%d]"
+bus_naming_style                        = "%s[%d]"
+bus_range_separator_style               = ":"
+hdlout_internal_busses                  = "false"
+verilogout_equation                     = "false"
+verilogout_higher_designs_first         = "false"
+verilogout_ignore_case                  = "true"
+verilogout_no_negative_index            = "true"
+verilogout_no_tri                       = "true"
+verilogout_show_unconnected_pins        = "true"
+verilogout_single_bit                   = "false"
+verilogout_unconnected_prefix   = "SYNOPSYS_UNCONNECTED_"
+
+change_names_dont_change_bus_members    = "false"
+change_names_update_inst_tree           = "true"
+uniquify_naming_style                   = "%s_%d"
+
+/* The following were set as recommended in the LSI document:
+ * Basic Synthesis Recommendations 11/8/99 */
+compile_preserve_subdesign_interfaces = "true"
+
+/*include /vobs/ri/vendorlib/ri_dc.setup*/
+
+target_library = "lcbg12p_lsi_wc.db "
+symbol_library = "generic.sdb"
+synthetic_library = {dw_foundation.sldb}
+link_library = "* lcbg12p_lsi_wc.db dw_foundation.sldb "
+search_path = { . d:/synopsys/libraries/syn d:/synopsys/dw/sim_ver d:/clinic/es9900/esfile/g12p d:/opensource/fpmul }
+
+default_schematic_options = "-size infinite"
+read -format verilog{"D:/opensource/fpmul/fpmul.v"}
+read -format verilog{"D:/opensource/fpmul/assemble.v"}
+read -format verilog{"D:/opensource/fpmul/exponent.v"}
+read -format verilog{"D:/opensource/fpmul/flag.v"}
+read -format verilog{"D:/opensource/fpmul/multiply.v"}
+read -format verilog{"D:/opensource/fpmul/normalize.v"}
+read -format verilog{"D:/opensource/fpmul/prenorm.v"}
+read -format verilog{"D:/opensource/fpmul/preprocess.v"}
+read -format verilog{"D:/opensource/fpmul/round.v"}
+read -format verilog{"D:/opensource/fpmul/shift.v"}
+read -format verilog{"D:/opensource/fpmul/special.v"}
+read -format verilog{"D:/opensource/fpmul/SynTestbed.v"}
+current_design "D:/opensource/fpmul/SynTestbed.db:SynTestbed"
+/*
+set_boundary_optimization "D:/opensource/fpmul/SynTestbed.db:SynTestbed"
+set_flatten true -design {"D:/opensource/fpmul/SynTestbed.db:SynTestbed"} -effort high -minimize none -phase true
+set_structure true -design {"D:/opensource/fpmul/SynTestbed.db"} -boolean false -timing false
+*/
+create_clock -name "clk" -period 12 -waveform {   "0" "6" } {   "clk" }
+uniquify
+
+set_fix_multiple_port_nets -all
+
+set_fanout_load 5 all_outputs()
+set_max_fanout 16 all_inputs()
+
+/* 11/5/99 - cp - Allow use of scan registers
+ * 		- Do not allow use of very low, or very high drive cells
+ */
+
+/* Here is the dont use script for the LCBG12P Technology,
+the script sets dont_use on the entire cell library and then
+remove the dont_use attribute on the cells allowed during RTL
+to gate mapping. This is to make sure that any new added cell
+is not accidentaly used until this has been properly checked-in
+for synthesis.
+ 
+Also be aware that the L cells are not allowed at this time due
+to limations in the synthesis tools, however they are allowed
+for the in-place optimization */
+
+
+/* dont_use on the entire library */
+dont_use  find(cell, "lcbg12p/*") 
+
+/* remove the dont_use attribute on the cells allowed for RTL
+to gate mapping
+------------------------IMPORTANT-------------------------
+if compile -scan is used, the this script should be used.
+compile -scan is recommended as during synthesis the real
+flip-flop delay at the input data (mux delay) is used. 
+*/
+
+
+remove_attribute find(cell, "lcbg12p/AND2AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND2BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND2CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND2DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND3DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND4AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND4BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND4CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AND4DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO211AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO211BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO211CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21CNAFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21CNBFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21CNCFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21CNDFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO21DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO222AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO222BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO222CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO22AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO22BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO22CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AO22DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI211AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI211BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI211CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI211DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI21AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI21BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI21CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI21DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI2222AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI2222BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI2222CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI222AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI222BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI222CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22AFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22BFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22CFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22CDNAFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22CDNBFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22CDNCFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22CDNDFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22DFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22DNAFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22DNBFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22DNCFP") dont_use
+remove_attribute find(cell, "lcbg12p/AOI22DNDFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/BUFAFP") dont_use
+remove_attribute find(cell, "lcbg12p/BUFBFP") dont_use
+remove_attribute find(cell, "lcbg12p/BUFCFP") dont_use
+remove_attribute find(cell, "lcbg12p/BUFDFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/EN3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/EN3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/EN3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/EN3DFP") dont_use
+remove_attribute find(cell, "lcbg12p/ENAFP") dont_use
+remove_attribute find(cell, "lcbg12p/ENBFP") dont_use
+remove_attribute find(cell, "lcbg12p/ENCFP") dont_use
+remove_attribute find(cell, "lcbg12p/ENDFP") dont_use
+remove_attribute find(cell, "lcbg12p/EO3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/EO3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/EO3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/EO3DFP") dont_use
+remove_attribute find(cell, "lcbg12p/EOAFP") dont_use
+remove_attribute find(cell, "lcbg12p/EOBFP") dont_use
+remove_attribute find(cell, "lcbg12p/EOCFP") dont_use
+remove_attribute find(cell, "lcbg12p/EODFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/FA1AAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FA1ABFP") dont_use
+remove_attribute find(cell, "lcbg12p/FA1ACFP") dont_use
+remove_attribute find(cell, "lcbg12p/FA1ADFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/FD1LQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD1LQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD1QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD1QCFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/FD1SLQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD1SLQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD1SQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD1SQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2LQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2LQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2SL2QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2SL2QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2SQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD2SQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD3QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD3QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD3SQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD3SQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD4QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD4QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD4SQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FD4SQCFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/FDN1QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN1QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN1SQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN1SQCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN2QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN2QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN2SQAFP") dont_use
+remove_attribute find(cell, "lcbg12p/FDN2SQCFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/HA1AFP") dont_use
+remove_attribute find(cell, "lcbg12p/HA1BFP") dont_use
+remove_attribute find(cell, "lcbg12p/HA1CFP") dont_use
+remove_attribute find(cell, "lcbg12p/HA1DFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/LD1QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD1QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD2QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD2QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD3QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD3QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD4QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD4QCFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD5QAFP") dont_use
+remove_attribute find(cell, "lcbg12p/LD5QCFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/MAJN3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/MAJN3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/MAJN3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21HAFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21HBFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21HCFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21HDFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21LAFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21LBFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21LCFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX21LDFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX31HAFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX31HBFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX31HCFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX31HDFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX41HAFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX41HBFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX41HCFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX41HDFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX61HCFP") dont_use
+remove_attribute find(cell, "lcbg12p/MUX81HCFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/N1AFP") dont_use
+remove_attribute find(cell, "lcbg12p/N1BFP") dont_use
+remove_attribute find(cell, "lcbg12p/N1CFP") dont_use
+remove_attribute find(cell, "lcbg12p/N1DFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/ND2AFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2BFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2BNAFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2BNBFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2BNCFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2BNDFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2CFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND2DFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND3DFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND4AFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND4BFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND4CFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND4DFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND5AFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND5BFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND5CFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND5DFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND6AFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND6BFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND6CFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND6DFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND8AFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND8BFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND8CFP") dont_use
+remove_attribute find(cell, "lcbg12p/ND8DFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/NR2AFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2BFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2BNAFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2BNBFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2BNCFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2BNDFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2CFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR2DFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR3DFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR4AFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR4BFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR4CFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR4DFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR5AFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR5BFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR5CFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR5DFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR6AFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR6BFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR6CFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR6DFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR8AFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR8BFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR8CFP") dont_use
+remove_attribute find(cell, "lcbg12p/NR8DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA211AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA211BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA211CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA21AFP") dont_use
+
+remove_attribute find(cell, "lcbg12p/OA21BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA21CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA21DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA222AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA222BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA222CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA22AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA22BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA22CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OA22DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI211AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI211BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI211CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI211DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI21AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI21BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI21CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI21DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI2222AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI2222BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI2222CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22CDNAFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22CDNBFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22CDNCFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22CDNDFP") dont_use
+remove_attribute find(cell, "lcbg12p/OAI22DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR2AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR2BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR2CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR2DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR3AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR3BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR3CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR3DFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR4AFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR4BFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR4CFP") dont_use
+remove_attribute find(cell, "lcbg12p/OR4DFP") dont_use
+
+set_max_area 0
+compile -map_effort high -area_effort high
+write -format db -hierarchy -output "D:/opensource/fpmul/SynTestbed.db" {"D:/opensource/fpmul/SynTestbed.db:SynTestbed"}
+current_design "D:/opensource/fpmul/fpmul.db:fpmul"
+write -format db -hierarchy -output "D:/opensource/fpmul/fpmul.db" {"D:/opensource/fpmul/fpmul.db:fpmul"}
+/* exit */
